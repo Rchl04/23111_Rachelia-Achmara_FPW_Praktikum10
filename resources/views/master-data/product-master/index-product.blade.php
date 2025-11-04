@@ -35,6 +35,30 @@
                 </button>
             </a>
 
+            <a href="{{ route('product-export-excel')}}">
+                <button class="px-6 py-4 text-white bg-green-500 border 
+                border-green-500 rounded-lg shadow-lg hover:bg-green-600
+                focus:outline-none focus:ring-2 focus:ring-green-500 mb-10">
+                    Export to Excel
+                </button>
+            </a>
+
+            <a href="{{ route('product-export-pdf')}}">
+                <button class="px-6 py-4 text-white bg-green-500 border 
+                border-green-500 rounded-lg shadow-lg hover:bg-green-600
+                focus:outline-none focus:ring-2 focus:ring-green-500 mb-10">
+                    Export to PDF
+                </button>
+            </a>
+
+            <a href="{{ route('product-export-jpg')}}">
+                <button class="px-6 py-4 text-white bg-green-500 border 
+                border-green-500 rounded-lg shadow-lg hover:bg-green-600
+                focus:outline-none focus:ring-2 focus:ring-green-500 mb-10">
+                    Export to JPG
+                </button>
+            </a>
+
             @if (session('success'))
             <div class="mb-4 rounded-lg bg-green-50 p-4 text-green-500">
                 {{ session('success') }}
@@ -44,6 +68,11 @@
                 {{ session('error') }}
             </div>
             @endif
+
+            @php
+            $sort = $sort ?? 'id';
+            $direction = $direction ?? 'asc';
+            @endphp
 
             <table class="min-w-full border border-collapse border-gray-200">
                 <thead>

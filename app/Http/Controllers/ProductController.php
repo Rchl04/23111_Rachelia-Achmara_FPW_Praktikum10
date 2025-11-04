@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Spatie\Browsershot\Browsershot;
 
 class ProductController extends Controller
 {
@@ -28,8 +33,8 @@ class ProductController extends Controller
         }
 
         // --- Fitur Sorting ---
-        $sort = $request->get('sort', 'id');
-        $direction = $request->get('direction', 'asc');
+        $sort = $request->get('sort', 'id') ?? 'id';
+        $direction = $request->get('direction', 'asc') ?? 'asc';
 
         // Batasi hanya kolom yang boleh di-sort
         $allowedSorts = ['product_name', 'unit', 'type', 'information', 'qty', 'producer'];
@@ -136,5 +141,27 @@ class ProductController extends Controller
             return redirect()->back()->with('success', 'Product berhasil dihapus.');
         }
         return redirect()->back()->with('error', 'Product tidak ditemukan.');
+    }
+
+    public function exportExcel(): BinaryFileResponse
+    {
+        return Excel::download(new ProductsExport, 'product.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        $products = Product::all(); // ambil data produk sesuai kebutuhan
+        $pdf = Pdf::loadView('master-data.product-master.export', compact('products'));
+        return $pdf->download('product.pdf');
+    }
+
+    public function exportJpg()
+    {
+        $products = Product::all();
+        $html = view('master-data.product-master.export', compact('products'))->render();
+        Browsershot::html($html)
+            ->setOption('args', ['--no-sandbox', '--disable-setuid-sandbox'])
+            ->save(storage_path('app/public/product.jpg'));
+        return response()->download(storage_path('app/public/product.jpg'))->deleteFileAfterSend(true);
     }
 }
